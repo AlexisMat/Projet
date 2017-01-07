@@ -5,22 +5,64 @@
  */
 package projet;
 
+import Class.Capteur;
+import Class.CapteurExterieur;
+import Class.CapteurInterieur;
+import java.util.ArrayList;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
 /**
  *
  * @author Quentin
  */
-public class Main extends javax.swing.JFrame {
+public class InterfaceVisu extends javax.swing.JFrame {
 
     /**
      * Creates new form NewJFrame
      */
     /* Il faut recupere les donnees du reseau*/
+    private ArrayList<CapteurInterieur> listeCapteurInt;
+    private ArrayList<CapteurExterieur> listeCapteurExt;
     
-    
-    public Main() {
+    public InterfaceVisu(ArrayList<CapteurInterieur> l,ArrayList<CapteurExterieur> l2 ) {
+        this.listeCapteurInt =  l;
+        this.listeCapteurExt = l2;
+      
         initComponents();
+          this.initArbre();
     }
 
+    
+    public void initArbre ()
+    {
+       DefaultTreeModel arbre;
+       arbre= (DefaultTreeModel) jTree1.getModel();
+       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot();
+       
+       for ( CapteurExterieur capteur : this.listeCapteurExt)
+       {
+          
+            DefaultMutableTreeNode nodeTypeCapteur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur");
+            DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
+            nodeTypeCapteur.add(nodeCapteur);
+            arbre.reload();          
+            root.add(nodeTypeCapteur);
+            arbre.reload();
+       }
+       
+        for ( CapteurInterieur capteur : this.listeCapteurInt)
+       {
+          
+            DefaultMutableTreeNode nodeTypeCapteur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
+            DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
+            nodeTypeCapteur.add(nodeCapteur);
+            arbre.reload();          
+            root.add(nodeTypeCapteur);
+            arbre.reload();
+       }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -40,7 +82,6 @@ public class Main extends javax.swing.JFrame {
         jTree1 = new javax.swing.JTree();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -87,15 +128,15 @@ public class Main extends javax.swing.JFrame {
 
         jSplitPane1.setRightComponent(jTabbedPane1);
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Capteur");
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree1.setToolTipText("");
         jScrollPane1.setViewportView(jTree1);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
-        jMenu1.setText("File");
+        jMenu1.setText("Connexion");
         jMenuBar1.add(jMenu1);
-
-        jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -116,42 +157,11 @@ public class Main extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Main().setVisible(true);
-            }
-        });
-    }
+  
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
