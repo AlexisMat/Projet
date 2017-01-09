@@ -5,12 +5,23 @@
  */
 package projet;
 
+import Class.BatimentEtage;
 import Class.Capteur;
 import Class.CapteurExterieur;
 import Class.CapteurInterieur;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 
 /**
  *
@@ -25,41 +36,152 @@ public class InterfaceVisu extends javax.swing.JFrame {
     private ArrayList<CapteurInterieur> listeCapteurInt;
     private ArrayList<CapteurExterieur> listeCapteurExt;
     
+    /* Liste pour laliste des batiment et lleur etage ainsi que leur salle qui leur sont lié*/
+    Set<String> listeBatiment =  new HashSet<>();
+    Map<String, Set<String>> listeEtage = new HashMap<>(); /* Prend un batiment en cle et donne un Set des Etage*/
+    Map<BatimentEtage , Set<String>>listeClasse =  new HashMap<>();
+   
+    
     public InterfaceVisu(ArrayList<CapteurInterieur> l,ArrayList<CapteurExterieur> l2 ) {
         this.listeCapteurInt =  l;
         this.listeCapteurExt = l2;
       
+         
         initComponents();
-          this.initArbre();
+        this.initLocalisation(); /* On charge le fichier des Batiment, Etage Salle*/
+        this.initArbre(); /*Arbre vide tant qu'on est pas connecter au reseau*/
     }
 
-    
+    public void initLocalisation ()
+    {
+      
+        try{
+                    InputStream flux=InterfaceVisu.class.getResourceAsStream("/Localisation.txt"); 
+                    InputStreamReader lecture=new InputStreamReader(flux);
+                    BufferedReader buff=new BufferedReader(lecture);
+                    String ligne;
+                    while ((ligne=buff.readLine())!=null){
+                        
+                        //System.out.println(ligne);
+                        String[] tab;
+                        tab = ligne.split("/");
+                        //System.out.println(tab[0]);
+                        listeBatiment.add(tab[0]);
+                             
+                        if (!listeEtage.containsKey(tab[0]))
+                        {
+                            //System.out.println("hey");
+                            listeEtage.put(tab[0], new HashSet<String>());
+                        }
+                            //System.out.println(tab[1]);   
+                            listeEtage.get(tab[0]).add(tab[1]);
+                            BatimentEtage batEta = new BatimentEtage(tab[0], tab[1]);
+                             
+                          
+                          //System.out.println(tab[2]);
+                          if ( !listeClasse.containsKey(batEta))
+                          {
+                                 //System.out.println("Hey2");
+                                 listeClasse.put(batEta,new HashSet<String>());
+                                 listeClasse.get(batEta).add(tab[2]);
+                                
+                          } 
+                          else
+                              listeClasse.get(batEta).add(tab[2]);
+                          
+                          
+                                                                             
+                       }
+                    
+                    buff.close(); 
+                                                         
+            }		
+               catch (Exception e){
+                  System.out.println(e.toString());
+             
+               }
+        System.out.println  (this.listeBatiment);
+        System.out.println  (this.listeEtage);
+        System.out.println  (this.listeClasse);
+        
+    }
+    public Boolean containNode ( DefaultMutableTreeNode n ,TreeNode r)
+    {
+	boolean contain = false;
+        
+	for (int i = 0; i < r.getChildCount(); i++)
+	{
+		if (r.getChildAt(i).equals(n))
+			contain = true;
+		else 
+			containNode(n,r.getChildAt(i));
+	}	
+
+        return contain;
+    }
     public void initArbre ()
     {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
-       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot();
+       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
+       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
+       DefaultMutableTreeNode nodeCapteurExterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur"); /*On contruit l'arbe a partir des liste des capteurs*/
+       DefaultMutableTreeNode nodeCapteurInterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
+       
+       /*On affiche l'arborescance des Batiment , Etage et salle malgres qu'il n'y a pas de capteur*/
+       for ( String batiment: this.listeBatiment)
+       {
+           
+          DefaultMutableTreeNode nodeBatiment = new javax.swing.tree.DefaultMutableTreeNode(batiment);
+          for (  String etage : listeEtage.get(batiment))
+          {
+              DefaultMutableTreeNode nodeEtage = new javax.swing.tree.DefaultMutableTreeNode(etage);
+              BatimentEtage batEtage =  new BatimentEtage(batiment, etage);
+              for (String salle : listeClasse.get(batEtage))
+              {
+                  DefaultMutableTreeNode nodeSalle = new javax.swing.tree.DefaultMutableTreeNode(salle);
+                  nodeEtage.add(nodeSalle);
+                  arbre.reload();
+              }
+              nodeBatiment.add(nodeEtage);
+              arbre.reload();
+          }
+          nodeCapteurInterieur.add(nodeBatiment);
+          arbre.reload();
+          root.add(nodeCapteurInterieur);
+          
+       }
        for ( CapteurExterieur capteur : this.listeCapteurExt)
        {
-          
-            DefaultMutableTreeNode nodeTypeCapteur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur");
+                     
             DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
-            nodeTypeCapteur.add(nodeCapteur);
+            nodeCapteurExterieur.add(nodeCapteur);
             arbre.reload();          
-            root.add(nodeTypeCapteur);
+            root.add(nodeCapteurExterieur);
             arbre.reload();
        }
        
         for ( CapteurInterieur capteur : this.listeCapteurInt)
        {
-          
-            DefaultMutableTreeNode nodeTypeCapteur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
+           /* String [] tab ;
+            tab=capteur.getLocalisation().split(" ");
+            DefaultMutableTreeNode nodeBatiment = new javax.swing.tree.DefaultMutableTreeNode(tab[0]);
+            DefaultMutableTreeNode nodeEtage = new javax.swing.tree.DefaultMutableTreeNode(tab[1]);
+            DefaultMutableTreeNode nodeSalle = new javax.swing.tree.DefaultMutableTreeNode(tab[2]);       
             DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
-            nodeTypeCapteur.add(nodeCapteur);
-            arbre.reload();          
-            root.add(nodeTypeCapteur);
+            
+         
+            nodeSalle.add(nodeCapteur);
             arbre.reload();
+            nodeEtage.add(nodeSalle);
+            arbre.reload();
+            nodeBatiment.add(nodeSalle);
+            arbre.reload();
+            nodeCapteurInterieur.add(nodeBatiment);      
+            arbre.reload();          
+            root.add(nodeCapteurInterieur);
+            arbre.reload();*/
        }
     }
     

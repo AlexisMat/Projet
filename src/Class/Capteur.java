@@ -13,7 +13,7 @@ import java.util.Date;
  * @author Quentin
  * La classe Capteur est abstract car il ne peut avoir que soit un capteur interieur ou exterieur.Le capteur seul est un concept
  */
-public abstract class  Capteur {
+public abstract class  Capteur  {
 
     public String getUniteDeMesure() {
         return uniteDeMesure;
@@ -107,6 +107,7 @@ public abstract class  Capteur {
         this.type = type;
     }
     
+ 
     
     
 }

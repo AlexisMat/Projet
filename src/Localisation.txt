@@ -1,0 +1,26 @@
+U1/1/101
+U1/1/102
+U1/1/103
+U1/2/201
+U1/2/202
+U1/2/203
+U1/3/301
+U1/3/302
+U1/3/303
+U2/1/106
+U2/1/107
+U2/2/208
+U2/2/209
+U2/2/210
+U3/2/AMPHI1
+U3/2/AMPHI2
+U3/3/AMPHI3
+U3/3/AMPHI4
+IRIT/1/ELIPSE
+IRIT/1/SMAC
+Batiment administratif/bas/Admi 1
+Batiment administratif/bas/Admi 2
+Batiment administratif/milieu/President 1
+Batiment administratif/milieu/President 2
+Batiment administratif/haut/Secretariat 1
+Batiment administratif/haut/Secretariat 2

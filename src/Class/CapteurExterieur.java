@@ -9,7 +9,7 @@ package Class;
  *
  * @author Quentin
  */
-public class CapteurExterieur extends Capteur {
+public class CapteurExterieur extends Capteur implements Comparable<CapteurExterieur>{
 
     public GPS getLocalisation() {
         return Localisation;
@@ -19,6 +19,11 @@ public class CapteurExterieur extends Capteur {
     public CapteurExterieur(String type,GPS localisation,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence) {
         super(type,uniteDeMesure, Identifant, i, date, precision, marge, frequence);
         this.Localisation = localisation;
+    }
+
+    @Override
+    public int compareTo(CapteurExterieur o) {
+       return this.getLocalisation().compareTo(o.getLocalisation()); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
