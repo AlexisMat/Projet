@@ -105,20 +105,6 @@ public class InterfaceVisu extends javax.swing.JFrame {
         System.out.println  (this.listeClasse);
         
     }
-    public Boolean containNode ( DefaultMutableTreeNode n ,TreeNode r)
-    {
-	boolean contain = false;
-        
-	for (int i = 0; i < r.getChildCount(); i++)
-	{
-		if (r.getChildAt(i).equals(n))
-			contain = true;
-		else 
-			containNode(n,r.getChildAt(i));
-	}	
-
-        return contain;
-    }
     public void initArbre ()
     {
        DefaultTreeModel arbre;
@@ -128,7 +114,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
        
        DefaultMutableTreeNode nodeCapteurExterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur"); /*On contruit l'arbe a partir des liste des capteurs*/
        DefaultMutableTreeNode nodeCapteurInterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
-       
+       root.add(nodeCapteurExterieur);
        /*On affiche l'arborescance des Batiment , Etage et salle malgres qu'il n'y a pas de capteur*/
        for ( String batiment: this.listeBatiment)
        {
@@ -152,17 +138,21 @@ public class InterfaceVisu extends javax.swing.JFrame {
           root.add(nodeCapteurInterieur);
           
        }
-       for ( CapteurExterieur capteur : this.listeCapteurExt)
-       {
-                     
-            DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
-            nodeCapteurExterieur.add(nodeCapteur);
-            arbre.reload();          
-            root.add(nodeCapteurExterieur);
-            arbre.reload();
-       }
+     
+        
+    }
+    
+    public void ajouterCapteurInterieur()
+    {
+       DefaultTreeModel arbre;
+       arbre= (DefaultTreeModel) jTree1.getModel();
+       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
+       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
-        for ( CapteurInterieur capteur : this.listeCapteurInt)
+    
+       DefaultMutableTreeNode nodeCapteurInterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
+       
+       for ( CapteurInterieur capteur : this.listeCapteurInt)
        {
            /* String [] tab ;
             tab=capteur.getLocalisation().split(" ");
@@ -183,6 +173,26 @@ public class InterfaceVisu extends javax.swing.JFrame {
             root.add(nodeCapteurInterieur);
             arbre.reload();*/
        }
+    }
+    public void ajouterCapteurExterieur()
+    {
+       DefaultTreeModel arbre;
+       arbre= (DefaultTreeModel) jTree1.getModel();
+       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
+       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       
+       DefaultMutableTreeNode nodeCapteurExterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur"); /*On contruit l'arbe a partir des liste des capteurs*/
+      
+          for ( CapteurExterieur capteur : this.listeCapteurExt)
+       {
+                     
+            DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
+            nodeCapteurExterieur.add(nodeCapteur);
+            arbre.reload();          
+            root.add(nodeCapteurExterieur);
+            arbre.reload();
+       }
+       
     }
     
     /**
