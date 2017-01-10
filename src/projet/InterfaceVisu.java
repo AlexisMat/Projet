@@ -36,6 +36,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
     private ArrayList<CapteurInterieur> listeCapteurInt;
     private ArrayList<CapteurExterieur> listeCapteurExt;
     
+
     /* Liste pour laliste des batiment et lleur etage ainsi que leur salle qui leur sont lié*/
     Set<String> listeBatiment =  new HashSet<>();
     Map<String, Set<String>> listeEtage = new HashMap<>(); /* Prend un batiment en cle et donne un Set des Etage*/
@@ -50,9 +51,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
         initComponents();
         this.initLocalisation(); /* On charge le fichier des Batiment, Etage Salle*/
         this.initArbre(); /*Arbre vide tant qu'on est pas connecter au reseau*/
+        this.updateCapteurExterieur(); /* Fonction qui met a jour les Capteur Exterieur */
+        this.updateCapteurInterieur();
     }
 
-    public void initLocalisation ()
+    private void initLocalisation ()
     {
       
         try{
@@ -62,23 +65,18 @@ public class InterfaceVisu extends javax.swing.JFrame {
                     String ligne;
                     while ((ligne=buff.readLine())!=null){
                         
-                        //System.out.println(ligne);
                         String[] tab;
                         tab = ligne.split("/");
-                        //System.out.println(tab[0]);
                         listeBatiment.add(tab[0]);
                              
                         if (!listeEtage.containsKey(tab[0]))
                         {
-                            //System.out.println("hey");
                             listeEtage.put(tab[0], new HashSet<String>());
-                        }
-                            //System.out.println(tab[1]);   
+                        }  
                             listeEtage.get(tab[0]).add(tab[1]);
                             BatimentEtage batEta = new BatimentEtage(tab[0], tab[1]);
                              
-                          
-                          //System.out.println(tab[2]);
+                         
                           if ( !listeClasse.containsKey(batEta))
                           {
                                  //System.out.println("Hey2");
@@ -89,8 +87,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
                           else
                               listeClasse.get(batEta).add(tab[2]);
                           
-                          
-                                                                             
+                                                                                                      
                        }
                     
                     buff.close(); 
@@ -105,16 +102,16 @@ public class InterfaceVisu extends javax.swing.JFrame {
         System.out.println  (this.listeClasse);
         
     }
-    public void initArbre ()
+    private void initArbre ()
     {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
-       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/     
        
        DefaultMutableTreeNode nodeCapteurExterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur"); /*On contruit l'arbe a partir des liste des capteurs*/
        DefaultMutableTreeNode nodeCapteurInterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
        root.add(nodeCapteurExterieur);
+       
        /*On affiche l'arborescance des Batiment , Etage et salle malgres qu'il n'y a pas de capteur*/
        for ( String batiment: this.listeBatiment)
        {
@@ -139,49 +136,61 @@ public class InterfaceVisu extends javax.swing.JFrame {
           
        }
      
-        
     }
     
-    public void ajouterCapteurInterieur()
+    private DefaultMutableTreeNode findNode ( DefaultMutableTreeNode n , DefaultMutableTreeNode e)
     {
+        
+        for ( int i = 0 ; i < n.getChildCount(); i++)
+        {
+          
+            DefaultMutableTreeNode courant = (DefaultMutableTreeNode) n.getChildAt(i);
+            if ( courant.toString().equals(e.toString()))
+            {
+                return (DefaultMutableTreeNode) n.getChildAt(i);
+            }
+        }
+       
+        return null;
+    }
+    private void updateCapteurInterieur()
+    {
+        
+      
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       Collections.sort(this.listeCapteurInt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
-    
-       DefaultMutableTreeNode nodeCapteurInterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Interieur");
-       
+       DefaultMutableTreeNode nodeCapteurInterieur =(DefaultMutableTreeNode) root.getChildAt(0);
+       System.out.println(nodeCapteurInterieur);
        for ( CapteurInterieur capteur : this.listeCapteurInt)
        {
-           /* String [] tab ;
-            tab=capteur.getLocalisation().split(" ");
-            DefaultMutableTreeNode nodeBatiment = new javax.swing.tree.DefaultMutableTreeNode(tab[0]);
-            DefaultMutableTreeNode nodeEtage = new javax.swing.tree.DefaultMutableTreeNode(tab[1]);
-            DefaultMutableTreeNode nodeSalle = new javax.swing.tree.DefaultMutableTreeNode(tab[2]);       
-            DefaultMutableTreeNode nodeCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
-            
-         
-            nodeSalle.add(nodeCapteur);
-            arbre.reload();
-            nodeEtage.add(nodeSalle);
-            arbre.reload();
-            nodeBatiment.add(nodeSalle);
-            arbre.reload();
-            nodeCapteurInterieur.add(nodeBatiment);      
+            String [] tab ;
+            tab=capteur.getLocalisation().split("/"); // On  separe les batiment des salle des etage
+            DefaultMutableTreeNode nodeBatimentCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[0]);
+            DefaultMutableTreeNode nodeEtageCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[1]);
+            DefaultMutableTreeNode nodeSalleCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[2]);       
+            DefaultMutableTreeNode nodeCapteur= new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
+           
+           
+            DefaultMutableTreeNode nodeBatiment = this.findNode(nodeCapteurInterieur, nodeBatimentCapteur); //Onrecupre le node du batiment          
+            DefaultMutableTreeNode nodeEtage = this.findNode(nodeBatiment, nodeEtageCapteur);         
+            DefaultMutableTreeNode nodeSalle = this.findNode(nodeEtage,nodeSalleCapteur);
+           
+            nodeSalle.add(nodeCapteur); // On ajoute  le capteur a l'arboresence 
             arbre.reload();          
-            root.add(nodeCapteurInterieur);
-            arbre.reload();*/
+           
        }
     }
-    public void ajouterCapteurExterieur()
+    private void updateCapteurExterieur()
     {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
        Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
-       DefaultMutableTreeNode nodeCapteurExterieur = new javax.swing.tree.DefaultMutableTreeNode("Capteur Exterieur"); /*On contruit l'arbe a partir des liste des capteurs*/
+       DefaultMutableTreeNode nodeCapteurExterieur = (DefaultMutableTreeNode) root.getChildAt(0); /*On contruit l'arbe a partir des liste des capteurs*/
       
           for ( CapteurExterieur capteur : this.listeCapteurExt)
        {
@@ -217,7 +226,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jSplitPane1.setDividerLocation(150);
+        jSplitPane1.setDividerLocation(250);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -236,11 +245,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 766, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab1", jPanel1);
@@ -249,11 +258,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 555, Short.MAX_VALUE)
+            .addGap(0, 766, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 364, Short.MAX_VALUE)
+            .addGap(0, 533, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab2", jPanel2);
@@ -276,7 +285,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1027, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

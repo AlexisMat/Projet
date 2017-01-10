@@ -38,9 +38,9 @@ public class Main {
         Intervalle interLum = new Intervalle(0,1000.0f);
         
         
-        CapteurInterieur radiateur =  new CapteurInterieur("Temperature","U3 3eme 301","Degres","Radiateur",interRad,"07/01/2017",0.1f,0.2f,60);
-        CapteurInterieur hygrometre =  new CapteurInterieur("Humidite","U3 2eme 202","%","Hygrometre",interHyg,"07/01/2017",1.f,0,90);
-        CapteurInterieur lumiere =  new CapteurInterieur("Luminosite","U3 1eme 1","Lumen","Lumiere",interLum,"07/01/2017",0.01f,0.2f,60);
+        CapteurInterieur radiateur =  new CapteurInterieur("Temperature","U2/2/208","Degres","Radiateur",interRad,"07/01/2017",0.1f,0.2f,60);
+        CapteurInterieur hygrometre =  new CapteurInterieur("Humidite","U2/2/208","%","Hygrometre",interHyg,"07/01/2017",1.f,0,90);
+        CapteurInterieur lumiere =  new CapteurInterieur("Luminosite","U3/2/AMPHI1","Lumen","Lumiere",interLum,"07/01/2017",0.01f,0.2f,60);
         
         CapteurExterieur radiateurExt = new CapteurExterieur("Temperature",posRad,"Degres","RadiateurExt",interRad,"07/01/2017",0.1f,0.2f,60);
         CapteurExterieur hygrometreExt =  new CapteurExterieur("Humidite",posHyg,"%","HygrometreExt",interHyg,"07/01/2017",1.f,0,90);

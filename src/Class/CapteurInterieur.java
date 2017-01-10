@@ -9,8 +9,10 @@ package Class;
  *
  * @author Quentin
  */
-public class CapteurInterieur extends Capteur {
+public class CapteurInterieur extends Capteur implements Comparable<CapteurInterieur>{
 
+    /* Convention pour la localisation  Batiment/Etage/salle*/
+    
     public String getLocalisation() {
         return localisation;
     }
@@ -20,9 +22,14 @@ public class CapteurInterieur extends Capteur {
     }
     private String localisation;
     
-    public CapteurInterieur(String type ,String localisation,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence) {
-        super(type,uniteDeMesure, Identifant, i, date, precision, marge, frequence);
+    public CapteurInterieur(String type ,String localisation,String uniteDeMesure, String identifant, Intervalle i, String date, float precision, float marge, Integer frequence) {
+        super(type,uniteDeMesure, identifant, i, date, precision, marge, frequence);
         this.localisation = localisation;
+    }
+
+    @Override
+    public int compareTo(CapteurInterieur o) {
+        return this.getIdentifant().compareTo(o.getIdentifant());
     }
     
 }
