@@ -16,8 +16,8 @@ public class CapteurExterieur extends Capteur implements Comparable<CapteurExter
     }
     private GPS Localisation; // A recuopere dans un fichier
     
-    public CapteurExterieur(String type,GPS localisation,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence) {
-        super(type,uniteDeMesure, Identifant, i, date, precision, marge, frequence);
+    public CapteurExterieur(TypeCapteur type,GPS localisation,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float v) {
+        super(type,uniteDeMesure, Identifant, i, date, precision, marge, frequence,v);
         this.Localisation = localisation;
     }
 

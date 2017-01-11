@@ -13,17 +13,15 @@ public class CapteurInterieur extends Capteur implements Comparable<CapteurInter
 
     /* Convention pour la localisation  Batiment/Etage/salle*/
     
-    public String getLocalisation() {
+   
+    private Localisation localisation;
+    
+    public Localisation getLocalisation() {
         return localisation;
     }
 
-    public void setLocalisation(String localisation) {
-        this.localisation = localisation;
-    }
-    private String localisation;
-    
-    public CapteurInterieur(String type ,String localisation,String uniteDeMesure, String identifant, Intervalle i, String date, float precision, float marge, Integer frequence) {
-        super(type,uniteDeMesure, identifant, i, date, precision, marge, frequence);
+    public CapteurInterieur(TypeCapteur type ,Localisation localisation,String uniteDeMesure, String identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float v) {
+        super(type,uniteDeMesure, identifant, i, date, precision, marge, frequence,v);
         this.localisation = localisation;
     }
 

@@ -9,6 +9,8 @@ import Class.BatimentEtage;
 import Class.Capteur;
 import Class.CapteurExterieur;
 import Class.CapteurInterieur;
+import Class.TypeCapteur;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,9 +21,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.RowFilter;
+import javax.swing.RowFilter.Entry;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  *
@@ -49,10 +62,41 @@ public class InterfaceVisu extends javax.swing.JFrame {
       
          
         initComponents();
+        
         this.initLocalisation(); /* On charge le fichier des Batiment, Etage Salle*/
         this.initArbre(); /*Arbre vide tant qu'on est pas connecter au reseau*/
         this.updateCapteurExterieur(); /* Fonction qui met a jour les Capteur Exterieur */
         this.updateCapteurInterieur();
+        
+        /* On Ajoute le filtrage */
+        
+        TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(jTable1.getModel()); /* on met lemodel du tableau dans un Table RowSorted*/
+        jTable1.setRowSorter(rowSorter);
+        jTextField1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = jTextField1.getText();
+                if ( text.trim().length() == 0)
+                  rowSorter.setRowFilter(RowFilter.regexFilter(null));
+                else
+                   rowSorter.setRowFilter(RowFilter.regexFilter("(?i)"+ text)); 
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = jTextField1.getText();
+                /*if ( text.trim().length() == 0)
+                  rowSorter.setRowFilter(RowFilter.regexFilter(null));
+                else*/
+                    rowSorter.setRowFilter(RowFilter.regexFilter("(?i)"+ text));
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        
     }
 
     private void initLocalisation ()
@@ -166,11 +210,10 @@ public class InterfaceVisu extends javax.swing.JFrame {
        System.out.println(nodeCapteurInterieur);
        for ( CapteurInterieur capteur : this.listeCapteurInt)
        {
-            String [] tab ;
-            tab=capteur.getLocalisation().split("/"); // On  separe les batiment des salle des etage
-            DefaultMutableTreeNode nodeBatimentCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[0]);
-            DefaultMutableTreeNode nodeEtageCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[1]);
-            DefaultMutableTreeNode nodeSalleCapteur = new javax.swing.tree.DefaultMutableTreeNode(tab[2]);       
+            /* On cree les node en fonction du batiment, salle et etage */
+            DefaultMutableTreeNode nodeBatimentCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getLocalisation().getBatiment());
+            DefaultMutableTreeNode nodeEtageCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getLocalisation().getEtage());
+            DefaultMutableTreeNode nodeSalleCapteur = new javax.swing.tree.DefaultMutableTreeNode(capteur.getLocalisation().getSalle());       
             DefaultMutableTreeNode nodeCapteur= new javax.swing.tree.DefaultMutableTreeNode(capteur.getIdentifant());
            
            
@@ -218,6 +261,8 @@ public class InterfaceVisu extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
@@ -230,26 +275,51 @@ public class InterfaceVisu extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Nom", "Type de Mesure", "Localisation", "Valeur"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(jTable1);
+
+        jLabel2.setText("Rechercher");
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 766, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(214, 214, 214)
+                .addComponent(jLabel2)
+                .addGap(50, 50, 50)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 503, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 11, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab1", jPanel1);
@@ -262,7 +332,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 533, Short.MAX_VALUE)
+            .addGap(0, 540, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("tab2", jPanel2);
@@ -272,6 +342,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Capteur");
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jTree1.setToolTipText("");
+        jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTree1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTree1);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
@@ -295,6 +370,118 @@ public class InterfaceVisu extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
+        // TODO add your handling code here:
+        String parcours =  jTree1.getLastSelectedPathComponent().toString();
+     
+        DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+        model.setNumRows(0); //on remet le tableau a zero a chauqe clique
+        model.setRowCount(0); 
+        Capteur capteurSeule = null;
+        for (CapteurExterieur capt : this.listeCapteurExt)
+        {
+            if ( capt.getIdentifant().equals(parcours))
+                 capteurSeule = capt;           
+        }
+        for (CapteurInterieur capt : this.listeCapteurInt)
+        {
+            if ( capt.getIdentifant().equals(parcours))          
+                capteurSeule = capt;                      
+        }
+        
+        if ( parcours.equals ("Capteur"))
+        {
+            for ( CapteurExterieur capteur : this.listeCapteurExt)
+            {
+                model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
+                    ,capteur.getVal() });
+            }
+            for ( CapteurInterieur capteur : this.listeCapteurInt)
+            {
+                model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                        "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+            }
+            
+        }
+        else if ( parcours.equals("Capteur Exterieur")) // On affiche tous les capteur Exterieur
+        {
+            for ( CapteurExterieur capteur : this.listeCapteurExt)
+            {
+                model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
+                    ,capteur.getVal() });
+            }
+        }
+        else if (parcours.equals("Capteur Interieur") ) // on affiche tous les capteurs Interieur
+        {
+            for ( CapteurInterieur capteur : this.listeCapteurInt)
+            {
+                model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                        "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+            }
+        }
+        else if ( listeBatiment.contains(parcours)) // on affiche tous les capteur d'un batiment
+        {
+           for (CapteurInterieur capteur : this.listeCapteurInt)
+           {
+               if ( capteur.getLocalisation().getBatiment().equals(parcours))
+               {
+                   model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                        "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+               }
+           }
+        }             
+        else if ( capteurSeule != null)
+        {
+                   
+            if (capteurSeule instanceof CapteurExterieur)
+            {
+                CapteurExterieur capteurExt = (CapteurExterieur) capteurSeule ;
+            
+            model.addRow(new Object[]{capteurSeule.getIdentifant(),capteurSeule.getType(),capteurExt.getLocalisation().getX()+","+capteurExt.getLocalisation().getY()
+                    ,capteurSeule.getVal() });
+            }
+            else {
+                
+                 CapteurInterieur capteurInt = (CapteurInterieur) capteurSeule;
+            
+                 model.addRow(new Object[]{capteurSeule.getIdentifant(),capteurSeule.getType(),capteurInt.getLocalisation().getBatiment()+"/"+capteurInt.getLocalisation().getEtage()+
+                        "/"+capteurInt.getLocalisation().getSalle(),capteurSeule.getVal() });
+            }
+        }
+        
+        else //Les capteur des salle et des etages
+        {
+            Object[] tab =  jTree1.getSelectionPath().getPath();
+            String bat = tab[2].toString();  /* On recupere  le baitment*/
+            String salle = tab[3].toString();
+               
+           for (CapteurInterieur capteur : this.listeCapteurInt)
+           {
+               if ( capteur.getLocalisation().getBatiment().equals(parcours) || capteur.getLocalisation().getBatiment().equals(bat) && capteur.getLocalisation().getEtage().equals(parcours)
+                       || capteur.getLocalisation().getSalle().equals(parcours))
+               {
+                   model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                        "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+               }
+           }
+               System.out.println(bat);
+               
+               
+               
+     
+        }
+        
+        /* Juste le capteur selectioné */
+        
+       
+       
+  
+    }//GEN-LAST:event_jTree1MouseClicked
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -302,6 +489,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
@@ -311,6 +499,9 @@ public class InterfaceVisu extends javax.swing.JFrame {
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
+
+   
 }
