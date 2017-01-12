@@ -24,7 +24,9 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    
+    /*Bug a regler apres -Caractere dans le filtrage
+                          - Deux cateur avec le meme identifant
+    */
     
     public static void main(String[] args) {
         // TODO code application logic here
