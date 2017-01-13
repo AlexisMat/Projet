@@ -54,7 +54,7 @@ public class CustomRenderer extends DefaultTableCellRenderer{
                 {
 
                    Float val = valeurAlerte(capteur);
-                   System.out.println(val+"="+capteur.getVal());
+                 
                    if  ( appartientListe(value.toString()) &&  val < capteur.getVal() )
                    {
                            c.setForeground(Color.RED);

@@ -6,7 +6,11 @@
 package projet;
 
 import Class.Capteur;
+import Class.CapteurExterieur;
+import Class.CapteurInterieur;
+import Class.CustomInscriptionRenderer;
 import java.util.ArrayList;
+import java.util.Set;
 import javax.swing.JCheckBox;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -20,32 +24,29 @@ public class FenetreIncription extends javax.swing.JPanel {
     /**
      * Creates new form FenetreIncription
      */
-    private ArrayList<Capteur> listeCapteur;
-    public FenetreIncription(ArrayList<Capteur> l) {
+    private final Set<Capteur> listeCapteur;
+    public FenetreIncription(Set<Capteur> l,Set<CapteurInterieur> i ,Set<CapteurExterieur> e ) {
         this.listeCapteur=  l;
         initComponents();
+        jTable1.getColumnModel().getColumn(0).setCellRenderer(new CustomInscriptionRenderer());
         DefaultTableModel model= (DefaultTableModel) jTable1.getModel();
         
         for (Capteur capt : this.listeCapteur)
         {
-            model.addRow(new Object[]{capt.getIdentifant(),new JCheckBox("Valider")});
+            if (  !e.contains(capt) && ! i.contains(capt) )
+            model.addRow(new Object[]{capt.getIdentifant()});
+            else
+             model.addRow(new Object[]{capt.getIdentifant(),true});
         
         }
         
-        
-        
-        
+   
     }
     
-    public  ArrayList<Capteur> capteurInscrit ()
+    public DefaultTableModel getTable()
     {
-         DefaultTableModel model= (DefaultTableModel) jTable1.getModel();
-        for ( int i =0 ;i <jTable1.getRowCount(); i++)
-        {
-            String nomCapteur= jTable1.getValueAt(i, 0).toString();
-            System.out.println(nomCapteur+" "+jTable1.getValueAt(i,1));
-        }
-        return null;
+        
+        return  (DefaultTableModel) jTable1.getModel();
     }
 
     /**
@@ -67,7 +68,22 @@ public class FenetreIncription extends javax.swing.JPanel {
             new String [] {
                 "Capteur", "Title 2"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.Object.class, java.lang.Boolean.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, true
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

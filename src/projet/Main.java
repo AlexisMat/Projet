@@ -14,6 +14,8 @@ import Class.Localisation;
 import Class.TypeCapteur;
 import java.awt.List;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -30,6 +32,8 @@ public class Main {
     
     public static void main(String[] args) {
         // TODO code application logic here
+        Set<Capteur> listeCapteur =  new HashSet<Capteur>();
+        
         ArrayList<CapteurInterieur>listeCapteurInt  = new ArrayList<CapteurInterieur>();
         ArrayList<CapteurExterieur>listeCapteurExt  = new ArrayList<CapteurExterieur>();
         
@@ -49,18 +53,18 @@ public class Main {
         CapteurExterieur hygrometreExt =  new CapteurExterieur(TypeCapteur.Humidité,posHyg,"%","HygrometreExt",interHyg,"07/01/2017",1.f,0,90,50);
         CapteurExterieur lumiereExt =  new CapteurExterieur(TypeCapteur.Luminosité,posLum,"Lumen","LumiereExt",interLum,"07/01/2017",0.01f,0.2f,60,96);
         
-        listeCapteurInt.add(radiateur);
-        listeCapteurInt.add(hygrometre);
-        listeCapteurInt.add(lumiere);
+        listeCapteur.add(radiateur);
+        listeCapteur.add(hygrometre);
+        listeCapteur.add(lumiere);
         
-        listeCapteurExt.add(radiateurExt);
-        listeCapteurExt.add(hygrometreExt);
-        listeCapteurExt.add(lumiereExt);
+        listeCapteur.add(radiateurExt);
+        listeCapteur.add(hygrometreExt);
+        listeCapteur.add(lumiereExt);
         
         
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new InterfaceVisu(listeCapteurInt,listeCapteurExt).setVisible(true);
+                new InterfaceVisu(listeCapteur).setVisible(true);
             }
         });
     }

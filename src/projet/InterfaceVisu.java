@@ -52,11 +52,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
      */
     
     /* Il faut recupere les donnees du reseau*/
-    private ArrayList<Capteur> listeCapteurReseau;
+    private final Set<Capteur> listeCapteurReseau;
     
     /*Liste des capteur inscrit*/
-    private ArrayList<CapteurInterieur> listeCapteurInt;
-    private ArrayList<CapteurExterieur> listeCapteurExt;
+    private Set<CapteurInterieur> listeCapteurInt = new HashSet<CapteurInterieur>();
+    private Set<CapteurExterieur> listeCapteurExt = new HashSet<CapteurExterieur>();
     
 
     /* Liste pour laliste des batiment et lleur etage ainsi que leur salle qui leur sont lié*/
@@ -69,9 +69,8 @@ public class InterfaceVisu extends javax.swing.JFrame {
     /*Modele du tableau des alertes*/
     DefaultTableModel tabAlerte = null ;
     
-    public InterfaceVisu(ArrayList<CapteurInterieur> l,ArrayList<CapteurExterieur> l2 ) {
-        this.listeCapteurInt =  l;
-        this.listeCapteurExt = l2;
+    public InterfaceVisu(Set<Capteur> l ) {
+        this.listeCapteurReseau = l;
       
          
         initComponents();
@@ -79,8 +78,14 @@ public class InterfaceVisu extends javax.swing.JFrame {
      
         this.initLocalisation(); /* On charge le fichier des Batiment, Etage Salle*/
         this.initArbre(); /*Arbre vide tant qu'on est pas connecter au reseau*/
-        this.updateCapteurExterieur(); /* Fonction qui met a jour les Capteur Exterieur */
-        this.updateCapteurInterieur();
+        if ( this.listeCapteurExt != null)
+        {
+            this.updateCapteurExterieur(); /* Fonction qui met a jour les Capteur Exterieur */
+        }
+        if ( this.listeCapteurInt != null )
+        {
+                this.updateCapteurInterieur();
+        }
         this.filtrage();
        
         
@@ -161,9 +166,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
                   System.out.println(e.toString());
              
                }
-        System.out.println  (this.listeBatiment);
-        System.out.println  (this.listeEtage);
-        System.out.println  (this.listeClasse);
+       
         
     }
     private void initArbre ()
@@ -224,7 +227,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       Collections.sort(this.listeCapteurInt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       //Collections.sort(this.listeCapteurInt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
        DefaultMutableTreeNode nodeCapteurInterieur =(DefaultMutableTreeNode) root.getChildAt(0);
        
@@ -253,7 +256,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       //Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
        
        DefaultMutableTreeNode nodeCapteurExterieur = (DefaultMutableTreeNode) root.getChildAt(0); /*On contruit l'arbe a partir des liste des capteurs*/
@@ -294,7 +297,6 @@ public class InterfaceVisu extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         jCheckBoxMenuItem1.setSelected(true);
@@ -404,16 +406,13 @@ public class InterfaceVisu extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem1);
 
-        jMenuItem2.setText("Inscrire Capteur");
+        jMenuItem2.setText("Ajouter/Enlever Capteur");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
             }
         });
         jMenu1.add(jMenuItem2);
-
-        jMenuItem3.setText("Descincre Capteur");
-        jMenu1.add(jMenuItem3);
 
         jMenuBar1.add(jMenu1);
 
@@ -446,22 +445,27 @@ public class InterfaceVisu extends javax.swing.JFrame {
     {
         Capteur capteur = null ;
         
+        if ( listeCapteurExt != null)
+        {
          for (CapteurExterieur capt : this.listeCapteurExt)
             {
                 if ( capt.getIdentifant().equals(str))
                      capteur = capt;           
             }
+        }
+        if ( listeCapteurInt != null)
+        {
             for (CapteurInterieur capt : this.listeCapteurInt)
             {
                 if ( capt.getIdentifant().equals(str))          
                     capteur= capt;                      
             }
+        }
             
             return capteur;
     }
-    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
-        // TODO add your handling code here:
-         jTable1.getColumn("Nom").setCellRenderer(new CustomRenderer(this.listeAlerte,this.tabAlerte));
+    private void reloadAbre ()
+    {
          
         DefaultMutableTreeNode n = (DefaultMutableTreeNode) jTree1.getLastSelectedPathComponent();
         if ( n != null)
@@ -476,44 +480,63 @@ public class InterfaceVisu extends javax.swing.JFrame {
     
             if ( parcours.equals ("Capteur"))
             {
-                for ( CapteurExterieur capteur : this.listeCapteurExt)
+                if ( listeCapteurExt!= null)
                 {
-                    model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
-                        ,capteur.getVal() });
+                                  
+                    for ( CapteurExterieur capteur : this.listeCapteurExt)
+                    {
+                        model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
+                            ,capteur.getVal() });
+                    }
                 }
-                for ( CapteurInterieur capteur : this.listeCapteurInt)
+                if ( listeCapteurInt != null)
                 {
-                    model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
-                            "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                    for ( CapteurInterieur capteur : this.listeCapteurInt)
+                    {
+                        model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                                "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                    }
                 }
 
             }
             else if ( parcours.equals("Capteur Exterieur")) // On affiche tous les capteur Exterieur
             {
-                for ( CapteurExterieur capteur : this.listeCapteurExt)
+                if ( this.listeBatiment != null)
                 {
-                    model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
-                        ,capteur.getVal() });
+                    if (this.listeCapteurExt != null)
+                    {
+                        for ( CapteurExterieur capteur : this.listeCapteurExt)
+                        {
+                            model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getX()+","+capteur.getLocalisation().getY()
+                                ,capteur.getVal() });
+                        }
+                    }
                 }
             }
             else if (parcours.equals("Capteur Interieur") ) // on affiche tous les capteurs Interieur
             {
-                for ( CapteurInterieur capteur : this.listeCapteurInt)
+                if (this.listeCapteurInt != null)
                 {
-                    model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
-                            "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                    for ( CapteurInterieur capteur : this.listeCapteurInt)
+                    {
+                        model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                                "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                    }
                 }
             }
             else if ( listeBatiment.contains(parcours)) // on affiche tous les capteur d'un batiment
             {
-               for (CapteurInterieur capteur : this.listeCapteurInt)
-               {
-                   if ( capteur.getLocalisation().getBatiment().equals(parcours))
-                   {
-                       model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
-                            "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
-                   }
-               }
+                if ( this.listeCapteurInt != null)
+                {
+                    for (CapteurInterieur capteur : this.listeCapteurInt)
+                    {
+                        if ( capteur.getLocalisation().getBatiment().equals(parcours))
+                        {
+                            model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                                 "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                        }
+                    }
+                }
             }             
             else if ( capteurSeule != null) // On affiche un seul capteur
             {
@@ -541,19 +564,21 @@ public class InterfaceVisu extends javax.swing.JFrame {
             {
                 Object[] tab =  jTree1.getSelectionPath().getPath();
                 String bat = tab[2].toString();  /* On recupere  le baitment*/
-                String salle = tab[3].toString();
-
-               for (CapteurInterieur capteur : this.listeCapteurInt)
-               {
-                   if ( capteur.getLocalisation().getBatiment().equals(parcours) || capteur.getLocalisation().getBatiment().equals(bat) && capteur.getLocalisation().getEtage().equals(parcours)
-                           || capteur.getLocalisation().getSalle().equals(parcours))
-                   {
-                       model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
-                            "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
-                   }
-               }
+                String salle = tab[3].toString();   
+                
+                if ( this.listeCapteurInt != null)
+                {
+                    for (CapteurInterieur capteur : this.listeCapteurInt)
+                    {
+                        if ( capteur.getLocalisation().getBatiment().equals(parcours) || capteur.getLocalisation().getBatiment().equals(bat) && capteur.getLocalisation().getEtage().equals(parcours)
+                                || capteur.getLocalisation().getSalle().equals(parcours))
+                        {
+                            model.addRow(new Object[]{capteur.getIdentifant(),capteur.getType(),capteur.getLocalisation().getBatiment()+"/"+capteur.getLocalisation().getEtage()+
+                                 "/"+capteur.getLocalisation().getSalle(),capteur.getVal() });
+                        }
+                    }
               
-            
+                }
             
             }   
                
@@ -564,7 +589,9 @@ public class InterfaceVisu extends javax.swing.JFrame {
         /* Juste le capteur selectioné */
         
        
-       
+    }
+    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
+        this.reloadAbre();
   
     }//GEN-LAST:event_jTree1MouseClicked
 
@@ -585,7 +612,71 @@ public class InterfaceVisu extends javax.swing.JFrame {
     /*Incrire un Capteur*/
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
-       // FenetreIncription p =  new FenetreIncription();
+        FenetreIncription p =  new FenetreIncription(this.listeCapteurReseau,this.listeCapteurInt,this.listeCapteurExt);
+          
+        int result =JOptionPane.showConfirmDialog(null, p,"Inscription",JOptionPane.OK_CANCEL_OPTION);
+        if( result  == JOptionPane.OK_OPTION)
+        {
+            /* On recupure le model du tableau*/
+            DefaultTableModel model = p.getTable();
+            
+            for ( int i= 0 ;i < model.getRowCount() ; i++)
+            {
+                String str = model.getValueAt(i,0).toString();
+                if ( model.getValueAt(i,1) != null  ) //Si la case n'a jamais etait coche
+                {
+                    String bol = model.getValueAt(i, 1).toString();
+                    System.out.println(bol);
+                    Capteur capteur  = null;
+                    for ( Capteur capt : this.listeCapteurReseau) //On recu
+                    {
+                        if ( capt.getIdentifant().equals(str) && bol.equals("true")) //Si jamais on met pas true on peut cocher et decocher et le capteut sera ajouter
+                        {
+                         
+                             if ( capt  instanceof CapteurExterieur)
+                             {                             
+                                 CapteurExterieur c  = (CapteurExterieur) capt; //on caste puis on ajoute a la list
+                                 this.listeCapteurExt.add(c );
+                             }
+                             else if ( capt instanceof CapteurInterieur)
+                             {
+                                CapteurInterieur c = (CapteurInterieur) capt;
+                                this.listeCapteurInt.add(c);
+                             }
+                        }
+                        else if  ( capt.getIdentifant().equals(str) && bol.equals("false")) // On enlev le capteur present
+                        {
+                            System.out.println(capt);
+                            if ( capt  instanceof CapteurExterieur)
+                             {                              
+                                 CapteurExterieur c  = (CapteurExterieur) capt; //on caste puis on ajoute a la list
+                                 this.listeCapteurExt.remove(c );
+                             }
+                             else if ( capt instanceof CapteurInterieur)
+                             {
+                                CapteurInterieur c = (CapteurInterieur) capt;
+                                this.listeCapteurInt.remove(c);
+                             }
+                                
+                        }    
+                        
+                       
+                     }
+                     
+                   
+                    
+                }
+                
+                
+            }
+                    
+                
+            this.reloadAbre();
+          
+        }
+        
+        
+        
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     
@@ -598,8 +689,6 @@ public class InterfaceVisu extends javax.swing.JFrame {
         {
             /* On recupure ici les donne du Server*/
                     
-           System.out.println(p.getIP());
-           System.out.println(p.getPort());
            Adresse adresse = new Adresse(p.getIP(),p.getPort());
         }
         
@@ -628,16 +717,21 @@ public class InterfaceVisu extends javax.swing.JFrame {
                    else if ( valeur.equals("") && this.listeAlerte.containsKey(capteur)) //
                    {
                        System.out.println(capteur.toString());
-                       //this.listeAlerte.remove(capteur);
+                       this.listeAlerte.remove(capteur);
                    }
                   
-                  
+                 
                    
                }
+               
+               jTable1.getColumn("Nom").setCellRenderer(new CustomRenderer(this.listeAlerte,this.tabAlerte));
+               this.reloadAbre();
+                       
+               
           
         }
         
-        System.out.println(listeAlerte);
+       
     }//GEN-LAST:event_jMenu2MouseClicked
 
     /**
@@ -654,7 +748,6 @@ public class InterfaceVisu extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;

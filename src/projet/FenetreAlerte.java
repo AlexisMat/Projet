@@ -11,6 +11,7 @@ import Class.CapteurInterieur;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,28 +24,35 @@ public class FenetreAlerte extends javax.swing.JPanel {
      * Creates new form FenetreAlerte
      * @param listeCapteurExt
      * @param listeCapteurInt
+     * @param listeAlerte
      */
    
 
-    public FenetreAlerte(ArrayList<CapteurExterieur> listeCapteurExt, ArrayList<CapteurInterieur> listeCapteurInt, Map<Capteur,Float> listeAlerte ) {
+    public FenetreAlerte(Set<CapteurExterieur> listeCapteurExt, Set<CapteurInterieur> listeCapteurInt, Map<Capteur,Float> listeAlerte ) {
         initComponents();
         DefaultTableModel  model = (DefaultTableModel) jTable1.getModel();
         
-        for ( CapteurInterieur capt : listeCapteurInt)
+        if ( listeCapteurInt != null)
         {
-            if ( listeAlerte.containsKey(capt))
-            model.addRow(new Object[]{capt.getIdentifant(),listeAlerte.get(capt)});
-            else
-            model.addRow(new Object[]{capt.getIdentifant(),15.0f});
-           
+            for ( CapteurInterieur capt : listeCapteurInt)
+            {
+                if ( listeAlerte.containsKey(capt))
+                model.addRow(new Object[]{capt.getIdentifant(),listeAlerte.get(capt)});
+                else
+                model.addRow(new Object[]{capt.getIdentifant(),""});
+
+            }
         }
-        for (CapteurExterieur capt : listeCapteurExt)
+        if (listeCapteurExt != null)
         {
-            if ( listeAlerte.containsKey(capt))
-            model.addRow(new Object[]{capt.getIdentifant(),listeAlerte.get(capt)});
-            else
-            model.addRow(new Object[]{capt.getIdentifant(),""});
-           
+            for (CapteurExterieur capt : listeCapteurExt)
+            {
+                if ( listeAlerte.containsKey(capt))
+                model.addRow(new Object[]{capt.getIdentifant(),listeAlerte.get(capt)});
+                else
+                model.addRow(new Object[]{capt.getIdentifant(),""});
+
+            }
         }
         
         
