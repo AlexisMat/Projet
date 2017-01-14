@@ -13,6 +13,7 @@ import Class.CapteurInterieur;
 import Class.CustomRenderer;
 import Class.GPS;
 import Class.Intervalle;
+import Class.Localisation;
 import Class.TypeCapteur;
 import java.io.BufferedInputStream;
 
@@ -26,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import static java.util.Date.from;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -324,7 +326,9 @@ public class InterfaceVisu extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
+        test = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -366,6 +370,13 @@ public class InterfaceVisu extends javax.swing.JFrame {
             }
         });
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -375,7 +386,9 @@ public class InterfaceVisu extends javax.swing.JFrame {
                 .addComponent(jLabel2)
                 .addGap(37, 37, 37)
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(928, Short.MAX_VALUE))
+                .addGap(368, 368, 368)
+                .addComponent(jButton1)
+                .addContainerGap(487, Short.MAX_VALUE))
             .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel1Layout.setVerticalGroup(
@@ -385,21 +398,30 @@ public class InterfaceVisu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 16, Short.MAX_VALUE))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addGap(0, 13, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Tabeau des Capteurs", jPanel1);
+
+        test.setText("jLabel1");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1140, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(292, 292, 292)
+                .addComponent(test, javax.swing.GroupLayout.PREFERRED_SIZE, 523, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(325, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 669, Short.MAX_VALUE)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(140, 140, 140)
+                .addComponent(test)
+                .addContainerGap(515, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("tab2", jPanel2);
@@ -580,6 +602,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
 
                 model.addRow(new Object[]{capteurSeule.getIdentifant(),capteurSeule.getType(),capteurExt.getLocalisation().getX()+","+capteurExt.getLocalisation().getY()
                         ,capteurSeule.getVal() });
+                      test.setText(this.chargerTableau().toString());
                 
                   
                 }
@@ -670,7 +693,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
         
     }
     
-    
+    /*permet d'ajouter un capteur dans le fichier*/
      private void addFichierCapteur(Capteur capt) {
        
         if ( !this.dejaPresent(capt))
@@ -688,11 +711,80 @@ public class InterfaceVisu extends javax.swing.JFrame {
         }
          
     }
+     /*Ajoute une valeur dans le fichier il faut lui passer le capteur d'on on vient de recevoir une nouvelle valeur*/
     private void addValeurFichierCapteur(Capteur capt)
     {
+        BufferedWriter bufferedWriter ;
+        try{
+                    bufferedWriter = new BufferedWriter(new FileWriter("./Capteur1.txt", true)); // On ecrit dans un deuxieme fihcier
+                    InputStream flux=new FileInputStream("./Capteur.txt"); 
+                     
+                    InputStreamReader lecture=new InputStreamReader(flux);
+                    BufferedReader buff=new BufferedReader(lecture);
+                    String ligne;
+                    while ((ligne=buff.readLine())!=null){
+                                         
+                        String[] tab;
+                        tab = ligne.split(":");
+                        System.out.println("tab"+tab[0]);
+                        if ( tab[0].equals(capt.getIdentifant()))
+                        {
+                            for (String tab1 : tab) {
+                                bufferedWriter.write(tab1);
+                                bufferedWriter.write(":");
+                            }
+                             bufferedWriter.write(capt.getVal()+"");       // On ajoute la nouvel valeur
+                                 
+                        }
+                        else
+                             bufferedWriter.write(ligne);
+                        
+                         bufferedWriter.newLine();
+                    }
+                    buff.close(); 
+                    bufferedWriter.close();
+                                                         
+            }		
+               catch (Exception e){
+                  System.out.println(e.toString());
+             
+               }
         
+        new File("./Capteur.txt").delete(); //on Suprimel'ancien fichier et on le remplace par le nouveau
+        new File("./Capteur1.txt").renameTo(new File("./Capteur.txt"));
     }
    
+    private HashMap<String,ArrayList<Float>> chargerTableau ()
+    {
+         HashMap<String,ArrayList<Float>> donnesCapteur = new HashMap<String,ArrayList<Float>>(); // Prend en entre le String correspodana l'id du 
+         
+         try{
+                    InputStream flux=new FileInputStream("./Capteur.txt"); 
+                    InputStreamReader lecture=new InputStreamReader(flux);
+                    BufferedReader buff=new BufferedReader(lecture);
+                    String ligne;
+                    while ((ligne=buff.readLine())!=null){
+                        
+                        String[] tab;
+                        tab = ligne.split(":");
+                        ArrayList<Float> l = new ArrayList<>();
+                        for (int  i = 1 ; i < tab.length; i++)
+                        {
+                            l.add(Float.parseFloat(tab[i]));
+                        }
+                        
+                        donnesCapteur.put(tab[0], l);
+                    }
+                    buff.close(); 
+                                                         
+            }		
+               catch (Exception e){
+                  System.out.println(e.toString());
+             
+               }
+        
+         return donnesCapteur;
+    }
     /*Incrire un Capteur*/
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
@@ -826,6 +918,13 @@ public class InterfaceVisu extends javax.swing.JFrame {
        
     }//GEN-LAST:event_jMenu2MouseClicked
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+         Intervalle interRad = new Intervalle(-10.0f,50.0f);
+         CapteurInterieur radiateur =  new CapteurInterieur(TypeCapteur.Temperature,new Localisation("U2","2","208"),"Degres","Radiateur",interRad,"07/01/2017",0.1f,0.2f,60,50);
+        this.addValeurFichierCapteur(radiateur);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -833,6 +932,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
@@ -849,6 +949,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTree jTree1;
+    private javax.swing.JLabel test;
     // End of variables declaration//GEN-END:variables
 
    
