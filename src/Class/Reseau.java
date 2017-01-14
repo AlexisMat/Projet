@@ -32,7 +32,15 @@ private PrintWriter out;
 private String msg;
 private Capteur capteur;
 private Adresse adresse;
+private Visualisation visu;
 
+    public Visualisation getVisu() {
+        return visu;
+    }
+
+    public void setVisu(Visualisation visu) {
+        this.visu = visu;
+    }
    
 public Adresse getAdresse() {
         return adresse;
@@ -85,13 +93,14 @@ public void setMsg(String msg) {
         this.msg = msg;
 }
      
-public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Capteur capteur,Adresse adresse) {
+public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Capteur capteur,Adresse adresse,Visualisation visu) {
         this.socket = socket;
         this.in = in;
         this.out = out;
         this.msg = msg;
         this.capteur = capteur;  
         this.adresse = adresse;
+        this.visu = visu;
 }
     
 
@@ -99,9 +108,9 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
         /*@Méthode pour connecter une interface de visualisation au serveur
         
         */
-	public static void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur) throws UnknownHostException, IOException {
+	public static void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur,Visualisation visu) throws UnknownHostException, IOException {
 		
-	  	msg = "ConnexionVisu;"+capteur.getIdentifant(); //Mettre le getID de l'interface de visualisation <- CHECK
+	  	msg = "ConnexionVisu;"+visu.getIdentifiant(); //Mettre le getID de l'interface de visualisation <- CHECK
 	  	try{ 
 	  		socket = new Socket(adresse.getIp(),adresse.getPort());//getIp et getPort ici <- CHECK
 	  		System.out.println("Demande de connexion");
@@ -160,7 +169,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
 	  	}
 	}
 	
-        /*@Méthode permettant d'inscrire les capteurs sélection via l'interface à l'interface de visu (Tableau)
+        /*@Méthode permettant d'inscrire les capteurs sélectionné via l'arbre au Tableau
         
         */
 	public static void InscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg) throws IOException{
@@ -217,27 +226,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
         
         */
 
-/*	public static void main() {
-		// TODO Auto-generated method stub
-		System.out.println("On ce co");
-	 	try {
-			Connexion(socket,in,out,msg);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	 	System.out.println("Voulez vous deco?");
-	 	@SuppressWarnings("resource")
-		Scanner sc = new Scanner (System.in);
-	 	String clavier = sc.nextLine();
-	 	if(clavier.equals("oui")){
-	 		try {
-				Deconnexion(socket,in,out,msg);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	 	}*/
+
 		
 	} // Fin de la classe
 
