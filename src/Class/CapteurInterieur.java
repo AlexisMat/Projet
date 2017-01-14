@@ -5,6 +5,8 @@
  */
 package Class;
 
+import java.util.Objects;
+
 /**
  *
  * @author Quentin
@@ -28,6 +30,31 @@ public class CapteurInterieur extends Capteur implements Comparable<CapteurInter
     @Override
     public int compareTo(CapteurInterieur o) {
         return this.getIdentifant().compareTo(o.getIdentifant());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 67 * hash + Objects.hashCode(this.localisation);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CapteurInterieur other = (CapteurInterieur) obj;
+        if (!Objects.equals(this.localisation, other.localisation)) {
+            return false;
+        }
+        return true;
     }
     
 }

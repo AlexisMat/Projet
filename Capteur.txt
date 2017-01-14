@@ -1,0 +1,6 @@
+LumiereExt:96.0
+Radiateur:10.0
+HygrometreExt:50.0
+Hygrometre:50.0
+Lumiere:20.0
+RadiateurExt:30.0
