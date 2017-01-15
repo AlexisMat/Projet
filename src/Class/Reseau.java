@@ -150,7 +150,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
         */
 	public  void InscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
 		 msg = "InscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR			
-	 	System.out.println("Inscription interface de visu aux capteur Id1");	 	
+	 	System.out.println("Inscription interface de visu aux capteur"+capteur.getIdentifant());	 	
 	 	out.println(msg);
 	 	out.flush();	 	
 		String message_distant = in.readLine();
@@ -162,8 +162,8 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
 		 * Pour un capteur extérieur:
 		 * CapteurPresent;<IdentifiantDuCapteur>;<TypeDuCapteur>;<CoordonnéeGPS_Lat>;<CoordonnéeGPS_Long>
 	 	 */
-  		if(message_distant.equals("InscriptionCapteurKO;Id1")){
-  			System.out.println("impossible de valider l’inscription de capteurs");
+  		if(message_distant.equals("InscriptionCapteurKO;"+capteur.getIdentifant())){
+  			System.out.println("impossible de valider l’inscription de capteur");
   			/*
   			 * @il faut mettre un pop up ici
   			 */
@@ -176,7 +176,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
 	public static void DesinscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
 		msg = "DesinscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR
                 
-		System.out.println("Desinscription interface de visu aux capteur Id1");	 	
+		System.out.println("Desinscription interface de visu aux capteur"+capteur.getIdentifant());	 	
 	 	out.println(msg);
 	 	out.flush();	 		
 		String message_distant = in.readLine();
