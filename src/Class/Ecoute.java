@@ -28,6 +28,8 @@ public class Ecoute extends Thread{
     private PrintWriter out;
     private BufferedWriter outF;
     
+    
+    //Constructeur de la classe Ecoute
     public Ecoute(Socket s, BufferedReader in, PrintWriter out) {
         this.s = s;
         this.in = in;
@@ -39,17 +41,16 @@ public class Ecoute extends Thread{
                         e.printStackTrace();        
         }
     }
-    
+    //méthode qui permet d'écrire dans un fichier outF
    public void Ecrire(String msg_distant) throws IOException{
               try{
-           
                  this.outF.write(msg_distant+"\r\n");
                  this.outF.flush();
               }catch (IOException e) {
                  e.printStackTrace();
               }  
    }
-   
+   //Destructeur pour le fichier   
    public void finalize()
    {
 	   try {
@@ -60,6 +61,8 @@ public class Ecoute extends Thread{
 	}
    }
    
+   
+   //Méthode lancer lors de l'utilisation de l'objet Ecoute
     public void run(){
         String msg_dist;
         try {
@@ -79,6 +82,8 @@ public class Ecoute extends Thread{
         }           
     }
     
+    
+    //Méthode qui lance l'Ecoute
     public void StartEc(){
         t = new Ecoute(s,in,out);
         t.start();
