@@ -33,16 +33,8 @@ private PrintWriter out;
 private String msg;
 //private Capteur capteur;
 private Adresse adresse;
-private Visualisation visu;
 
-    public Visualisation getVisu() {
-        return visu;
-    }
 
-    public void setVisu(Visualisation visu) {
-        this.visu = visu;
-    }
-   
 public Adresse getAdresse() {
         return adresse;
 }
@@ -94,14 +86,14 @@ public void setMsg(String msg) {
         this.msg = msg;
 }
      
-public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse,Visualisation visu) {
+public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse) {
         this.socket = socket;
         this.in = in;
         this.out = out;
         this.msg = msg;
         //this.capteur = capteur;  
         this.adresse = adresse;
-        this.visu = visu;
+       
 }
     
 
@@ -109,9 +101,9 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
         /*@Méthode pour connecter une interface de visualisation au serveur
         
         */
-	public  void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur,Visualisation visu) throws UnknownHostException, IOException {
+	public  void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur) throws UnknownHostException, IOException {
 		
-	  	msg = "ConnexionVisu;"+visu.getIdentifiant(); //Mettre le getID de l'interface de visualisation <- CHECK
+	  	msg = "ConnexionVisu;Visualisation"; 
 	  	try{ 		
 	  		System.out.println("Demande de connexion");
 	  		out.println(msg);//On envoie la demande de connexion d'une interface de visualisation
