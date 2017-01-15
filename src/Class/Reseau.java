@@ -101,9 +101,9 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
         /*@Méthode pour connecter une interface de visualisation au serveur
         
         */
-	public  void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur) throws UnknownHostException, IOException {
+	public  void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur,String idVisu) throws UnknownHostException, IOException {
 		
-	  	msg = "ConnexionVisu;Visualisation"; 
+	  	msg = "ConnexionVisu;"+idVisu; 
 	  	try{ 		
 	  		System.out.println("Demande de connexion");
 	  		out.println(msg);//On envoie la demande de connexion d'une interface de visualisation
