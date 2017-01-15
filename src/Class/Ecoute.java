@@ -1,9 +1,10 @@
+package Class;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Class;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,24 +26,38 @@ public class Ecoute extends Thread{
     private Socket s;
     private BufferedReader in;
     private PrintWriter out;
-
+    private BufferedWriter outF;
+    
     public Ecoute(Socket s, BufferedReader in, PrintWriter out) {
         this.s = s;
         this.in = in;
         this.out = out;
+        try {
+            this.outF = new BufferedWriter(new FileWriter(new File("rsce.txt"),true));
+        } catch (IOException e) {
+			// TODO Auto-generated catch block			
+                        e.printStackTrace();        
+        }
     }
+    
    public void Ecrire(String msg_distant) throws IOException{
-              BufferedWriter outF = null;
               try{
-                 outF = new BufferedWriter(new FileWriter(new File("rsce.txt")));
-                 outF.write(msg_distant);
-                 outF.write("\n");
-                 outF.flush();
-                 outF.close();
-              } catch (IOException e) {
+           
+                 this.outF.write(msg_distant+"\r\n");
+                 this.outF.flush();
+              }catch (IOException e) {
                  e.printStackTrace();
-              } 
-             
+              }  
+   }
+   
+   public void finalize()
+   {
+	   try {
+		this.outF.close();
+	} catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
    }
    
     public void run(){
@@ -56,12 +71,12 @@ public class Ecoute extends Thread{
         while(!s.isClosed() ){
             try {
                 msg_dist = in.readLine();
+                System.out.println(msg_dist);
                 Ecrire(msg_dist);
             } catch (IOException ex) {
                 Logger.getLogger(Ecoute.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        
+        }           
     }
     
     public void StartEc(){
