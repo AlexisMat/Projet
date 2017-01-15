@@ -31,7 +31,7 @@ private Socket socket;
 private BufferedReader in;
 private PrintWriter out;
 private String msg;
-private Capteur capteur;
+//private Capteur capteur;
 private Adresse adresse;
 private Visualisation visu;
 
@@ -51,13 +51,13 @@ public void setAdresse(Adresse adresse) {
         this.adresse = adresse;
 }
   
-public Capteur getCapteur() {
+/*public Capteur getCapteur() {
         return capteur;
 }
 
 public void setCapteur(Capteur capteur) {
         this.capteur = capteur;
-}
+}*/
 
 public Socket getSocket() {
         return socket;
@@ -94,12 +94,12 @@ public void setMsg(String msg) {
         this.msg = msg;
 }
      
-public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Capteur capteur,Adresse adresse,Visualisation visu) {
+public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse,Visualisation visu) {
         this.socket = socket;
         this.in = in;
         this.out = out;
         this.msg = msg;
-        this.capteur = capteur;  
+        //this.capteur = capteur;  
         this.adresse = adresse;
         this.visu = visu;
 }
@@ -139,13 +139,10 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
 	public  void Deconnexion(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse) throws UnknownHostException, IOException {
 	
 	    msg = "DeconnexionVisu";
-	  	try{ 
-	  		
-	  		System.out.println("Demande de Deconnexion");
-	  		
+	  	try{ 	  		
+	  		System.out.println("Demande de Deconnexion");	  		
 	  		out.println(msg);//On envoie la demande de deconnexion d'une interface de visualisation
-	  		out.flush();//Vidage du buffer
-	  		
+	  		out.flush();//Vidage du buffer	  		
 	  		String message_distant = in.readLine();
 	  		System.out.println(message_distant);	  	
                                   	socket.close();
@@ -159,8 +156,8 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
         /*@Méthode permettant d'inscrire les capteurs sélectionné via l'arbre au Tableau
         
         */
-	public  void InscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg) throws IOException{
-		 			
+	public  void InscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
+		 msg = "InscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR			
 	 	System.out.println("Inscription interface de visu aux capteur Id1");	 	
 	 	out.println(msg);
 	 	out.flush();	 	
@@ -184,8 +181,9 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Cap
 	/*@Méthode permettant de Déconnecter un ou plusieurs capteurs de l'interface de visu
         
         */
-	public static void DesinscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg) throws IOException{
-		msg = "DesinscriptionCapteur;Id1";
+	public static void DesinscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
+		msg = "DesinscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR
+                
 		System.out.println("Desinscription interface de visu aux capteur Id1");	 	
 	 	out.println(msg);
 	 	out.flush();	 		
