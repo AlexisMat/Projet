@@ -7,6 +7,7 @@ package Class;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  *
@@ -71,7 +72,7 @@ public abstract class  Capteur  {
         this.frequence = frequence;
     }
 
-    public Capteur(TypeCapteur type ,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float valeur) {
+    public Capteur(String type ,String uniteDeMesure, String Identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float valeur) {
         this.uniteDeMesure = uniteDeMesure;
         this.Identifant = Identifant;
         this.i = i;
@@ -89,7 +90,7 @@ public abstract class  Capteur  {
     private float precision;
     private float marge ;
     private Integer frequence;
-    private TypeCapteur type;
+    private String type;
     private float val;
 
     public float getVal() {
@@ -100,12 +101,52 @@ public abstract class  Capteur  {
         this.val = val;
     }
 
-    public TypeCapteur getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(TypeCapteur type) {
+    public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.Identifant);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Capteur other = (Capteur) obj;
+        if (Float.floatToIntBits(this.marge) != Float.floatToIntBits(other.marge)) {
+            return false;
+        }
+        if (!Objects.equals(this.uniteDeMesure, other.uniteDeMesure)) {
+            return false;
+        }
+        if (!Objects.equals(this.Identifant, other.Identifant)) {
+            return false;
+        }
+        if (!Objects.equals(this.type, other.type)) {
+            return false;
+        }
+        if (!Objects.equals(this.i, other.i)) {
+            return false;
+        }
+        if (!Objects.equals(this.frequence, other.frequence)) {
+            return false;
+        }
+        return true;
     }
     
  

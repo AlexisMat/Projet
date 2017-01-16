@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
+import javax.swing.JOptionPane;
+import projet.InterfaceVisu;
 
 
 public class Reseau  {
@@ -31,25 +33,8 @@ private Socket socket;
 private BufferedReader in;
 private PrintWriter out;
 private String msg;
-//private Capteur capteur;
-private Adresse adresse;
+private String idVisu;
 
-
-public Adresse getAdresse() {
-        return adresse;
-}
-
-public void setAdresse(Adresse adresse) {
-        this.adresse = adresse;
-}
-  
-/*public Capteur getCapteur() {
-        return capteur;
-}
-
-public void setCapteur(Capteur capteur) {
-        this.capteur = capteur;
-}*/
 
 public Socket getSocket() {
         return socket;
@@ -86,13 +71,14 @@ public void setMsg(String msg) {
         this.msg = msg;
 }
      
-public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse) {
+public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg ,String idVisu) {
         this.socket = socket;
         this.in = in;
         this.out = out;
         this.msg = msg;
+        this.idVisu = idVisu;
         //this.capteur = capteur;  
-        this.adresse = adresse;
+        
        
 }
     
@@ -101,21 +87,24 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
         /*@Méthode pour connecter une interface de visualisation au serveur
         
         */
-	public  void Connexion(Socket socket, BufferedReader in, PrintWriter out, String msg,Adresse adresse, Capteur capteur,String idVisu) throws UnknownHostException, IOException {
+	public  void Connexion() throws UnknownHostException, IOException {
 		
-	  	msg = "ConnexionVisu;"+idVisu; 
+	  	msg = "ConnexionVisu;"+this.idVisu; 
 	  	try{ 		
 	  		System.out.println("Demande de connexion");
-	  		out.println(msg);//On envoie la demande de connexion d'une interface de visualisation
-	  		out.flush();//Vidage du buffer
+	  		this.out.println(msg);//On envoie la demande de connexion d'une interface de visualisation
+	  		this.out.flush();//Vidage du buffer
 	  		String message_distant = in.readLine();
-	  		System.out.println(message_distant);
+                        System.out.println(message_distant);
 	  		if(!message_distant.equals("ConnexionOK")){ //Si la connection n'est pas OK alors ...
 	  			System.out.println("ERREUR");
 	  			/*
 	  			 * @il faut mettre un pop up ici
+                                
 	  			 */
-                                                        socket.close(); /*Si il y a une erreur on close la socket sinon on la laisse ouverte 
+                                 
+                                 //JOptionPane.showMessageDialog(, "Error", "error", JOptionPane.ERROR_MESSAGE);
+                                 this. socket.close(); /*Si il y a une erreur on close la socket sinon on la laisse ouverte 
                                                         tant que l'on a pas de demande de deco
                                                         */
 	  		}	  		
@@ -128,7 +117,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
 	
 	/*@Méthode pour deconnecter une interface de visualisation du serveur.
         */
-	public  void Deconnexion(Socket socket, BufferedReader in, PrintWriter out, String msg, Adresse adresse) throws UnknownHostException, IOException {
+	public  void Deconnexion() throws UnknownHostException, IOException {
 	
 	    msg = "DeconnexionVisu";
 	  	try{ 	  		
@@ -148,12 +137,12 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
         /*@Méthode permettant d'inscrire les capteurs sélectionné via l'arbre au Tableau
         
         */
-	public  void InscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
-		 msg = "InscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR			
+	public  void InscriptionVisu(Capteur capteur) throws IOException{
+		this.msg = "InscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR			
 	 	System.out.println("Inscription interface de visu aux capteur"+capteur.getIdentifant());	 	
-	 	out.println(msg);
-	 	out.flush();	 	
-		String message_distant = in.readLine();
+	 	this.out.println(msg);
+	 	this.out.flush();	 	
+		String message_distant = this.in.readLine();
   		System.out.println(message_distant);	  
 	 	/*
 	 	 * @il faudrat compter le nombre de capteurs que l'on inscrip pour pouvoir Recupéré leur données.
@@ -173,8 +162,8 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
 	/*@Méthode permettant de Déconnecter un ou plusieurs capteurs de l'interface de visu
         
         */
-	public static void DesinscriptionVisu(Socket socket,BufferedReader in, PrintWriter out, String msg,Capteur capteur) throws IOException{
-		msg = "DesinscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR
+	public void DesinscriptionVisu(Capteur capteur) throws IOException{
+		this.msg = "DesinscriptionCapteur;"+capteur.getIdentifant();//FAUT RECUP LEURS PUTAIN D ID MDRRRRRR
                 
 		System.out.println("Desinscription interface de visu aux capteur"+capteur.getIdentifant());	 	
 	 	out.println(msg);
@@ -182,7 +171,7 @@ public Reseau(Socket socket, BufferedReader in, PrintWriter out, String msg, Adr
 		String message_distant = in.readLine();
   		System.out.println(message_distant);	  
 	 	
-  		if(!message_distant.equals("DesinscriptionCapteurOK;Id1")){ // Si  la Desinscription n'est pas OK  pour le capteur d'id  = id1 alors ... 
+  		if(message_distant.equals("DesinscriptionCapteurKO;"+capteur.getIdentifant())){ // Si  la Desinscription n'est pas OK  pour le capteur d'id  = id1 alors ... 
   			System.out.println("impossible de valider la desinscription de capteurs");
   			/*
   			 * @il faut mettre un pop up ici

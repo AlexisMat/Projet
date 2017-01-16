@@ -23,23 +23,36 @@ public class FenetreIncription extends javax.swing.JPanel {
 
     /**
      * Creates new form FenetreIncription
+     * @param l
+     * @param i
+     * @param e
      */
-    private final Set<Capteur> listeCapteur;
-    public FenetreIncription(Set<Capteur> l,Set<CapteurInterieur> i ,Set<CapteurExterieur> e ) {
-        this.listeCapteur=  l;
+  
+    
+
+    public FenetreIncription(Set<Capteur> listeCapteurReseau, ArrayList<CapteurInterieur> listeCapteurInt, ArrayList<CapteurExterieur> listeCapteurExt) {
+        
         initComponents();
         jTable1.getColumnModel().getColumn(0).setCellRenderer(new CustomInscriptionRenderer());
         DefaultTableModel model= (DefaultTableModel) jTable1.getModel();
         
-        for (Capteur capt : this.listeCapteur)
+        for ( int  cpt = 0 ; cpt < model.getRowCount() ; cpt++)
         {
-            if (  !e.contains(capt) && ! i.contains(capt) )
-            model.addRow(new Object[]{capt.getIdentifant()});
-            else
-             model.addRow(new Object[]{capt.getIdentifant(),true});
-        
+            model.removeRow(cpt);
         }
-        
+     
+      
+        if ( listeCapteurReseau != null)
+        {
+            for (Capteur capt : listeCapteurReseau)
+            {
+                if (  !listeCapteurInt.contains(capt) && ! listeCapteurExt.contains(capt) )
+                model.addRow(new Object[]{capt.getIdentifant()});
+                else
+                 model.addRow(new Object[]{capt.getIdentifant(),true});
+
+            }
+        }
    
     }
     

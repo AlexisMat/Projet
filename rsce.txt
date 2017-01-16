@@ -1,0 +1,12 @@
+CapteurPresent;radia;Temp�rature;0.0;0.0
+InscriptionCapteurOK
+ValeurCapteur;radia;4.2700996
+ValeurCapteur;radia;0.29298544
+ValeurCapteur;radia;0.83620846
+ValeurCapteur;radia;3.8817883
+ValeurCapteur;radia;3.8664472
+ValeurCapteur;radia;2.115742
+ValeurCapteur;radia;4.923605
+ValeurCapteur;radia;1.3459688
+ValeurCapteur;radia;3.9714227
+DesinscriptionCapteurOK

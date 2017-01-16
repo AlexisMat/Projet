@@ -25,7 +25,14 @@ public class FenetreConnexion extends javax.swing.JPanel {
     }
     public int getPort()
     {
+        if ( !jTextField2.getText().equals(""))
         return Integer.parseInt(jTextField2.getText());
+        else
+            return 0;
+    }
+    public String getId()
+    {
+        return jTextField3.getText();
     }
 
     /**

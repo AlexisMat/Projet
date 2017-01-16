@@ -11,7 +11,7 @@ package Class;
  */
 public enum TypeCapteur {
     
-    Temperature ("Temperature"),
+    Température ("Temp�rature"),
     Humidité ("Humidite"),
     Luminosité ("Luminosité"),
     VolumeSonore ("Volume Sonore"),

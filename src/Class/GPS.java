@@ -7,25 +7,30 @@ package Class;
 
 /**
  *
- * @author Quentin
+ * @
+ * Quentin
  */
+
 public class GPS implements Comparable<GPS>{
 
-    public GPS(int x, int y) {
+    
+    float x;
+    float y;
+
+    public GPS(float x, float y) {
         this.x = x;
         this.y = y;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    int x;
-    int y;
+   
     
     
     @Override

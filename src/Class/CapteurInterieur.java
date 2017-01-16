@@ -22,7 +22,7 @@ public class CapteurInterieur extends Capteur implements Comparable<CapteurInter
         return localisation;
     }
 
-    public CapteurInterieur(TypeCapteur type ,Localisation localisation,String uniteDeMesure, String identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float v) {
+    public CapteurInterieur(String type ,Localisation localisation,String uniteDeMesure, String identifant, Intervalle i, String date, float precision, float marge, Integer frequence,float v) {
         super(type,uniteDeMesure, identifant, i, date, precision, marge, frequence,v);
         this.localisation = localisation;
     }

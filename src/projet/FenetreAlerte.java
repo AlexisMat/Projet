@@ -26,9 +26,9 @@ public class FenetreAlerte extends javax.swing.JPanel {
      * @param listeCapteurInt
      * @param listeAlerte
      */
-   
-
-    public FenetreAlerte(Set<CapteurExterieur> listeCapteurExt, Set<CapteurInterieur> listeCapteurInt, Map<Capteur,Float> listeAlerte ) {
+  
+    public FenetreAlerte(ArrayList<CapteurExterieur> listeCapteurExt, ArrayList<CapteurInterieur> listeCapteurInt, Map<Capteur, Float> listeAlerte) {
+        
         initComponents();
         DefaultTableModel  model = (DefaultTableModel) jTable1.getModel();
         
@@ -54,8 +54,6 @@ public class FenetreAlerte extends javax.swing.JPanel {
 
             }
         }
-        
-        
     }
     
     public DefaultTableModel getTable ()

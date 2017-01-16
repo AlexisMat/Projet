@@ -5,15 +5,17 @@
  */
 package projet;
 
-import Class.Adresse;
+
 import Class.BatimentEtage;
 import Class.Capteur;
 import Class.CapteurExterieur;
 import Class.CapteurInterieur;
 import Class.CustomRenderer;
+import Class.Ecoute;
 import Class.GPS;
 import Class.Intervalle;
 import Class.Localisation;
+import Class.Reseau;
 import Class.TypeCapteur;
 import java.io.BufferedInputStream;
 
@@ -27,7 +29,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import static java.util.Date.from;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -62,11 +68,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
      */
     
     /* Il faut recupere les donnees du reseau*/
-    private final Set<Capteur> listeCapteurReseau;
+    private final Set<Capteur> listeCapteurReseau = new HashSet<Capteur>();
     
     /*Liste des capteur inscrit*/
-    private Set<CapteurInterieur> listeCapteurInt = new HashSet<CapteurInterieur>();
-    private Set<CapteurExterieur> listeCapteurExt = new HashSet<CapteurExterieur>();
+    private ArrayList<CapteurInterieur> listeCapteurInt = new ArrayList<CapteurInterieur>();
+    private ArrayList<CapteurExterieur> listeCapteurExt = new ArrayList<CapteurExterieur>();
     
 
     /* Liste pour laliste des batiment et lleur etage ainsi que leur salle qui leur sont lié*/
@@ -79,10 +85,17 @@ public class InterfaceVisu extends javax.swing.JFrame {
     /*Modele du tableau des alertes*/
     DefaultTableModel tabAlerte = null ;
     
+    boolean ecoute =  false;
+    
+    Reseau reseau ;
+    Ecoute ec;
+    private Socket s;
+    private BufferedReader in;
+    private PrintWriter out;
+    
+    boolean b = true;
     public InterfaceVisu(Set<Capteur> l ) {
-        this.listeCapteurReseau = l;
-      
-         
+       
         initComponents();
         
         GPS posRad  = new GPS(50,60);
@@ -103,14 +116,46 @@ public class InterfaceVisu extends javax.swing.JFrame {
                 this.updateCapteurInterieur();
         }*/
         this.filtrage();
-       
         
+           
+
+
+
+  
+   
+              
         /* On Ajoute le filtrage */
         
         
         
+}
+    public void ecouteReseau()
+    {
+        
+    Thread t = new Thread() {
+      public void run() {
+          
+          while(b)
+          {
+              try {
+                  sleep(1000);
+              } catch (InterruptedException ex) {
+                  Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+              }
+                lireCapteurReseau();
+                reloadTable();
+          }
+        
+      }
+    };
+    t.start();
+    
+        
     }
-
+        
+        
+        
+        
     private void filtrage ()
     {
         TableRowSorter<TableModel> rowSorter = new TableRowSorter<TableModel>(jTable1.getModel()); /* on met lemodel du tableau dans un Table RowSorted*/
@@ -248,7 +293,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();  
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       //Collections.sort(this.listeCapteurInt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       Collections.sort(this.listeCapteurInt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        DefaultMutableTreeNode nodeCapteurInterieur =(DefaultMutableTreeNode) root.getChildAt(1);
        
       
@@ -280,7 +325,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
        DefaultTreeModel arbre;
        arbre= (DefaultTreeModel) jTree1.getModel();
        DefaultMutableTreeNode root = (DefaultMutableTreeNode) arbre.getRoot(); /* On recupre la racine*/
-       //Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
+       Collections.sort(this.listeCapteurExt); //On trie par longitutude X grace a des compareTo dans Capteur Exterieur et GPS
        
        
        DefaultMutableTreeNode nodeCapteurExterieur = (DefaultMutableTreeNode) root.getChildAt(0); /*On contruit l'arbe a partir des liste des capteurs*/
@@ -370,7 +415,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("jButton1");
+        jButton1.setText("Deconnexion");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -388,7 +433,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
                 .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(368, 368, 368)
                 .addComponent(jButton1)
-                .addContainerGap(487, Short.MAX_VALUE))
+                .addContainerGap(248, Short.MAX_VALUE))
             .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         jPanel1Layout.setVerticalGroup(
@@ -424,7 +469,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
                 .addContainerGap(515, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("tab2", jPanel2);
+        jTabbedPane1.addTab("Valeur d'un capteur", jPanel2);
 
         jSplitPane1.setRightComponent(jTabbedPane1);
 
@@ -534,6 +579,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
     
             if ( parcours.equals ("Capteur"))
             {
+                 //jTable1.getColumn("Nom").setCellRenderer(new CustomRenderer(this.listeAlerte,this.tabAlerte));
                 if ( listeCapteurExt!= null)
                 {
                                   
@@ -594,7 +640,8 @@ public class InterfaceVisu extends javax.swing.JFrame {
             }             
             else if ( capteurSeule != null) // On affiche un seul capteur
             {
-               
+               /* Ici on genere le graphique pour le capteur*/
+                test.setText(this.chargerTableau(capteurSeule).toString());
                 
                 if (capteurSeule instanceof CapteurExterieur)
                 {
@@ -602,7 +649,7 @@ public class InterfaceVisu extends javax.swing.JFrame {
 
                 model.addRow(new Object[]{capteurSeule.getIdentifant(),capteurSeule.getType(),capteurExt.getLocalisation().getX()+","+capteurExt.getLocalisation().getY()
                         ,capteurSeule.getVal() });
-                      test.setText(this.chargerTableau().toString());
+                      
                 
                   
                 }
@@ -754,10 +801,10 @@ public class InterfaceVisu extends javax.swing.JFrame {
         new File("./Capteur1.txt").renameTo(new File("./Capteur.txt"));
     }
    
-    private HashMap<String,ArrayList<Float>> chargerTableau ()
+    private ArrayList<Float> chargerTableau (Capteur capt)
     {
-         HashMap<String,ArrayList<Float>> donnesCapteur = new HashMap<String,ArrayList<Float>>(); // Prend en entre le String correspodana l'id du 
-         
+        
+          ArrayList<Float> l = new ArrayList<>();
          try{
                     InputStream flux=new FileInputStream("./Capteur.txt"); 
                     InputStreamReader lecture=new InputStreamReader(flux);
@@ -767,13 +814,14 @@ public class InterfaceVisu extends javax.swing.JFrame {
                         
                         String[] tab;
                         tab = ligne.split(":");
-                        ArrayList<Float> l = new ArrayList<>();
-                        for (int  i = 1 ; i < tab.length; i++)
-                        {
-                            l.add(Float.parseFloat(tab[i]));
+                        if ( tab[0].equals(capt.getIdentifant()))
+                        {   
+                            for (int  i = 1 ; i < tab.length; i++)
+                            {
+                                l.add(Float.parseFloat(tab[i]));
+                            }
                         }
                         
-                        donnesCapteur.put(tab[0], l);
                     }
                     buff.close(); 
                                                          
@@ -783,13 +831,14 @@ public class InterfaceVisu extends javax.swing.JFrame {
              
                }
         
-         return donnesCapteur;
+         return l;
     }
     /*Incrire un Capteur*/
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         // TODO add your handling code here:
+         lireCapteurReseau();
         FenetreIncription p =  new FenetreIncription(this.listeCapteurReseau,this.listeCapteurInt,this.listeCapteurExt);
-          
+       
         int result =JOptionPane.showConfirmDialog(null, p,"Inscription",JOptionPane.OK_CANCEL_OPTION);
         if( result  == JOptionPane.OK_OPTION)
         {
@@ -811,14 +860,29 @@ public class InterfaceVisu extends javax.swing.JFrame {
                              {                             
                                  CapteurExterieur c  = (CapteurExterieur) capt; //on caste puis on ajoute a la list
                                  if( !listeCapteurExt.contains(c))
-                                     this.listeCapteurExt.add(c );
+                                 {
+                                     System.out.println("Incrit le capreut "+capt.getIdentifant());
+                                     this.listeCapteurExt.add(c ); // On ajoute le capteur a la liste
+                                     try {
+                                         reseau.InscriptionVisu(c);//On a joute le capteur au reseai
+                                     } catch (IOException ex) {
+                                         Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+                                     }
+                                 }
                                  this.updateCapteurExterieur();
                              }
                              else if ( capt instanceof CapteurInterieur)
                              {
                                 CapteurInterieur c = (CapteurInterieur) capt;
                                 if ( !listeCapteurInt.contains(c))
+                                {
                                     this.listeCapteurInt.add(c);
+                                    try {
+                                         reseau.InscriptionVisu(c);//On a joute le capteur au reseai
+                                     } catch (IOException ex) {
+                                         Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+                                     }
+                                }
                                 this.updateCapteurInterieur();
                              }
                             
@@ -843,6 +907,11 @@ public class InterfaceVisu extends javax.swing.JFrame {
                              }
                                 
                             this.enleverNode(capt);
+                            try {
+                                         reseau.DesinscriptionVisu(capt);//On a joute le capteur au reseai
+                                     } catch (IOException ex) {
+                                         Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+                                     }
                         }    
                         
                        
@@ -863,6 +932,76 @@ public class InterfaceVisu extends javax.swing.JFrame {
         
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+    public boolean estPresent (String name)
+    {
+        for ( Capteur capt : this.listeCapteurReseau)
+        {
+            if (capt.getIdentifant().equals(name))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    public void lireCapteurReseau ()
+    {
+        try{
+                    InputStream flux=new FileInputStream("./rsce.txt"); 
+                    InputStreamReader lecture=new InputStreamReader(flux);
+                    BufferedReader buff=new BufferedReader(lecture);
+                    String ligne;
+                    while ((ligne=buff.readLine())!=null){
+                        
+                        String[] tab;
+                        tab = ligne.split(";");
+                         
+                        System.out.println("ligne = "+ligne+"tab = "+tab.length);
+                        if ( tab[0].equals("CapteurPresent"))
+                        {   
+                            
+                            System.out.println("ligne = "+ligne+"tab = "+tab.length);
+                            if ( !this.estPresent(tab[1]))
+                            {
+                                if ( tab.length == 7 ) // Si jamais le tableau fait  7  alors c'est forcement un capteur interieur 
+                                this.listeCapteurReseau.add(new CapteurInterieur(tab[2],new Localisation(tab[3],tab[4],tab[5]),"",tab[1],null,null,0.f,0.f,null,0.f));
+                                else if (tab.length == 5)
+                                this.listeCapteurReseau.add(new CapteurExterieur(tab[2],new GPS(Float.parseFloat(tab[3]),Float.parseFloat(tab[4])),"",tab[1],null,null,0.f,0.f,null,0.f));
+                     
+                            
+                            
+                            }
+                         
+                        }
+                        else if ( tab[0].equals("ValeurCapteur"))
+                        {
+                           
+                            Capteur capteurModfier = this .findCapteur(tab[1]);
+                            System.out.println("Capteur"+capteurModfier);
+                            if ( capteurModfier != null)
+                                capteurModfier.setVal(Float.parseFloat(tab[2]));
+                            //if ( Float.parseFloat(tab[2]) != capteurModfier.getVal()) //Si la valeur change alors on l'ecrit dans le fichier des valeurs
+                                //this.addValeurFichierCapteur(capteurModfier);
+                            else
+                                b = false;
+                                
+                               
+                        }
+                        
+                        
+                        
+                    }
+                    buff.close(); 
+                                                         
+            }		
+               catch (IOException | NumberFormatException e){
+                  System.out.println("Erreuer"+e.toString());
+             
+               }
+        
+        
+        
+    }
     
     /* Connexion au serveur*/
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -870,10 +1009,31 @@ public class InterfaceVisu extends javax.swing.JFrame {
         FenetreConnexion p =  new FenetreConnexion();
         int result =JOptionPane.showConfirmDialog(null, p,"Connexion",JOptionPane.OK_CANCEL_OPTION);
         if( result  == JOptionPane.OK_OPTION)
+            
         {
-            /* On recupure ici les donne du Server*/
-                    
-           Adresse adresse = new Adresse(p.getIP(),p.getPort());
+           
+           if ( p.getId() != null && p.getPort() != 0 && p.getIP()!= null)
+           {
+                try {
+                     /* On recupure ici les donne du Server*/    
+                     s = new Socket(p.getIP(),p.getPort());
+                     in = new  BufferedReader(new InputStreamReader(s.getInputStream()));
+                     out = new PrintWriter(s.getOutputStream());
+
+                     reseau =  new Reseau(s, in, out, "", p.getId());
+                     reseau.Connexion();
+                     ec =  new Ecoute(s,in,out);
+                     ec.StartEc();
+                     ecoute=true;
+                     this.ecouteReseau();
+
+
+
+                 } catch (IOException ex) {
+                     Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+                     b = false;
+                 }
+           }
         }
         
         /* Ajouter ici tous les capteur du reseau dans cette liste*/
@@ -920,9 +1080,12 @@ public class InterfaceVisu extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-         Intervalle interRad = new Intervalle(-10.0f,50.0f);
-         CapteurInterieur radiateur =  new CapteurInterieur(TypeCapteur.Temperature,new Localisation("U2","2","208"),"Degres","Radiateur",interRad,"07/01/2017",0.1f,0.2f,60,50);
-        this.addValeurFichierCapteur(radiateur);
+        b =false;
+        try {
+            reseau.Deconnexion();
+        } catch (IOException ex) {
+            Logger.getLogger(InterfaceVisu.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**

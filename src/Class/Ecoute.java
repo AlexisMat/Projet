@@ -55,6 +55,7 @@ public class Ecoute extends Thread{
    {
 	   try {
 		this.outF.close();
+                this.outF.flush();
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -75,6 +76,7 @@ public class Ecoute extends Thread{
             try {
                 msg_dist = in.readLine();
                 System.out.println(msg_dist);
+                
                 Ecrire(msg_dist);
             } catch (IOException ex) {
                 Logger.getLogger(Ecoute.class.getName()).log(Level.SEVERE, null, ex);
